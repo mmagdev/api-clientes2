@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: api-clientes
+
+server:
+  port: 8082
+
