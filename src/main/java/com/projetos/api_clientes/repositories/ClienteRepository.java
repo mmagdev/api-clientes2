@@ -2,9 +2,13 @@ package com.projetos.api_clientes.repositories;
 
 import com.projetos.api_clientes.entities.Cliente;
 import com.projetos.api_clientes.factories.ConnectionFactory;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+@RestController
 public class ClienteRepository {
 
     /*
@@ -42,7 +46,50 @@ public class ClienteRepository {
         connection.close();
 
 
+    }
 
+    public List<Cliente> consultarPorNome(String nome) throws Exception {
+
+        //Abrindo conexão com o banco
+        var factory = new ConnectionFactory();
+        var connection = factory.getConnection();
+
+        //Consultando os clientes cadastrados no banco por nome
+        try {
+
+            var statement = connection.prepareStatement("""
+                    select id, nome, email, cpf, telefone, data_cadastro
+                    from clientes
+                    where nome = ?
+                    order by nome
+                    """);
+
+            statement.setString(1,"%" + nome + "%" );
+            var result = statement.executeQuery();
+            var lista = new ArrayList<Cliente>();
+
+            while(result.next()){
+                var cliente = new Cliente();
+
+                cliente.setNome(result.getString("id"));
+                cliente.setEmail(result.getString("email"));
+                cliente.setCpf(result.getString("cpf"));
+                cliente.setTelefone(result.getString("telefone"));
+                cliente.setDataCadastro(result.getTimestamp("data_cadastro").toLocalDateTime());
+
+                lista.add(cliente); //Adicionando o cliente à lista
+
+            }
+
+            connection.close();
+            return lista;
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+
+        }
 
     }
 }
